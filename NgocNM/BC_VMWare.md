@@ -1,17 +1,27 @@
-# **VMWare Workstation**
+# VMWare Workstation
 ----
-## **Mục lục**
+## Mục lục
 [1. Cài đặt VMWare, cách tạo máy ảo](#1)
 
-[2. Network mặc định khi mới cài đặt VMWare](#2)
+[2. Các cơ chế hoạt động và mô hình cơ bản khi cấu hình với switch ảo (VMnet)](#2)
 
-   - [2.1. Thêm, xóa một vmnet](#2.1)
+   - [2.1. Network mặc định khi mới cài đặt VMware](#2.1)
 
-   - [2.2. Sửa dải IP của một vmnet](#2.2)
+   - [2.2. Chế độ Bridge](#2.2)
+   
+   - [2.3. Chế độ Host-only](#2.3)
 
-   -  [2.3. Cấu hình DHCP](#2.3)
+   - [2.4. Chế độ NAT](#2.4)
 
-   - [2.4. Thêm một card mạng vào máy ảo](#2.4)
+[3. Các thao tác với VMware](#3)
+
+   - [3.1. Thêm, xóa một vmnet](#3.1)
+
+   - [3.2. Sửa dải IP của một vmnet](#3.2)
+
+   - [3.3. Cấu hình DHCP](#3.3)
+
+   - [3.4. Thêm một card mạng vào máy ảo](#3.4)
 ----
 <a name="1"></a>
 # 1. Cài đặt VMWare, cách tạo máy ảo
@@ -60,22 +70,52 @@ Khi đã cài xong VMWare, để tạo một máy ảo Ubuntu, trước hết ta
 <img src="http://2.pik.vn/2018929e9341-9ba9-4277-b429-30499cf279c6.png">
 
 <a name="2"></a>
-# 2. Network mặc định khi mới cài VMWare
+# 2. Các cơ chế hoạt động và mô hình cơ bản khi cấu hình với Switch ảo (VMnet) 
 
-Khi mới cài đặt VMWare, mặc định phần mềm sẽ cài đặt 2 card mạng:
-- Card Bridge: Card này sử dụng chính card mạng thật của máy để kết nối ra ngoài Internet (card Ethernet hoặc Wireless). Do đó khi sử dụng card mạng này, IP của máy ảo sẽ cùng với dải IP của máy thật.
-- Card NAT: Card này sẽ Nat địa chỉ IP của máy thật ra một địa chỉ khác cho máy ảo sử dụng. Card này cũng có thể kết nối ra bên ngoài Internet.
+<a name="2.1"></a>
+## 2.1. Network mặc định khi mới cài VMware
+
+Mỗi VMnet như là một Switch ảo mà VMware tạo ra, việc gán 1 card mạng của máy ảo vào một VMnet giống như việc cầm 1 dây mạng, 1 đầu cắm vào card của máy ảo đó và 1 đầu cắm vào "Switch ảo" có tên VMnet tương ứng
+
+Khi mới cài đặt VMWare, mặc định trong phần Network của máy thật sẽ tạo ra 2 Adapter mạng là VMnet0 và VMnet8, tương đương với việc từ máy thật hiện tại đã được cắm "dây mạng" với 2 "Switch ảo" VMnet0 và VMnet8 => chỉ cần đặt địa chỉ IP cho 2 card mạng này của máy thật cùng dải IP với các máy ảo cũng nối vào 2 "Switch ảo" này thì máy thật và máy ảo có thể kết nối với nhau thông qua một trong 2 card mạng này.
+
+- Card Bridge (VMnet0): Card này sử dụng chính card mạng thật của máy để kết nối ra ngoài Internet (card Ethernet hoặc Wireless). Do đó khi sử dụng card mạng này, IP của máy ảo sẽ cùng với dải IP của máy thật.
+- Card NAT (VMnet8): Card này có thể kết nối ra bên ngoài Internet. NAT cho phép một máy ảo truy cập mạng sử dụng địa chỉ IP cùng dải với địa chỉ IP của máy thật.
 
 Để xem các card mạng đã có trong VMWare, ta bật WmWare lên, chọn "Edit" -> "Virtual Network Editor"
 
 <img src="http://2.pik.vn/20184db9426f-58de-4cc2-be65-4e627715297b.png">
 
-Ta có thể thấy trong hình, card bridge có tên là VMnet0, card NAT có tên là VMnet8
+Nhận thấy, Card Bridge không có địa chỉ IP, nó sẽ sử dụng dải IP của máy thật. VMWare sẽ tự sinh một dải IP và gán cho VMnet8, trong trường hợp này là 192.168.75.0/24
 
-Card bridge không có địa chỉ IP, nó sẽ sử dụng dải IP của máy thật. VMWare sẽ tự sinh một dải IP và gán cho VMnet8. trong trường hợp này, dải của tôi là dải 192.168.75.0/24
+<a name="2.2"></a>
+## 2.2. Chế độ Bridge
 
-<a name="2.1"></a>
-## 2.1. Thêm, xóa một vmnet
+Ở chế độ này, card mạng trên máy ảo được gắn vào VMnet0, VMnet0 này liên kết trực tiếp với card mạng vật lý trên máy thật. Máy ảo lúc này sẽ kết nối Internet thông qua card mạng vật lý và có chung lớp mạng (dải IP) với card mạng vật lý.
+
+<img src="http://2.pik.vn/2018d4b259d6-089b-476b-8523-aa62fb5b4470.png">
+
+<a name="2.3"></a>
+## 2.3. Chế độ Host-only
+
+Card mạng máy ảo được kết nối với VMnet có tính năng Host-only (VMnet1). Ở chế độ này, các máy ảo không thể kết nối vào mạng vật lý bên ngoài hay Internet thông qua máy thật. IP của máy ảo được cấp bởi DHCP server của VMnet tương ứng (các thiết bị kết nối đến VMnet này sẽ nhận được địa chỉ do DHCP server cấp phát)
+-> Như vậy, các máy ảo ở chế độ Host-only có cùng dải IP sẽ kết nối được với nhau nhưng không thể kết nối ra các thiết bị vật lý khác cũng như ra ngoài Internet **bởi nó không được kết nối với card vật lý của máy thật**.
+
+<img src="http://2.pik.vn/2018f7ac7c8f-c345-4ee5-a831-a4a2273a536d.png">
+
+<a name="2.4"></a>
+## 2.4. Chế độ NAT (Network address translation)
+
+Card mạng máy ảo kết nối với VMnet8, VMnet8 cho phép máy ảo đi ra mạng vật lý bên ngoài internet thông qua cơ chế NAT. Lúc này lớp mạng bên trong máy ảo khác hoàn toàn với lớp mạng của card vật lý bên ngoài máy thật. IP của card mạng máy ảo sẽ được cấp bởi DHCP server của VMnet8, IP này sẽ qua NAT device và kết nối ra ngoài Internet.
+-> Như vậy, Một máy ảo sử dụng địa chỉ IP do DHCP server cấp qua NAT device thành IP có cùng dải với IP máy thật từ đó có thể truy cập ra ngoài Internet.
+
+<img src="http://2.pik.vn/2018198c54ac-a327-4161-ae50-99d9ed4feebb.png">
+
+<a name="3"></a>
+# 3. Các thao tác với VMware
+
+<a name="3.1"></a>
+## 3.1. Thêm, xóa một vmnet
 ### Thêm một Vmnet
 
 Click "Virtual Network Editor" chọn:
@@ -96,22 +136,22 @@ Click "Virtual Network Editor" chọn một vmnet -> Click "Remove Network"
 
 <img src="http://2.pik.vn/2018d6414c26-54cf-413f-a857-7a8bb0061968.png">
 
-<a name="2.2"></a>
-## 2.2. Sửa dải IP của một vmnet
+<a name="3.2"></a>
+## 3.2. Sửa dải IP của một vmnet
 Các dải IP mà VMWare tự sinh ra và gắn cho card mạng rất khó nhớ. Ta có thể đổi dải IP này như sau:
 Chọn VMnet muốn đổi địa chỉ. Trong dòng Subnet IP chọn dải IP và subnet muốn thay đổi -> Click "Apply và OK"
 
 <img src="http://2.pik.vn/20185464f4f7-800f-48fa-92b6-8d3684fbf7d2.png">
 
-<a name="2.3"></a>
-## 2.3. Cấu hình DHCP
+<a name="3.3"></a>
+## 3.3. Cấu hình DHCP
 Các card mạng này có thể cấp DHCP cho các máy ảo sử dụng nó.
 Chọn DHCP Settings -> Chọn dải IP dùng để cấp DHCP
 
 <img src="http://2.pik.vn/2018fc00501c-7b74-4f5c-96de-da741ec4f1fb.png">
 
-<a name="2.4"></a>
-## 2.4. Thêm một card mạng vào máy ảo
+<a name="3.4"></a>
+## 3.4. Thêm một card mạng vào máy ảo
 Show ip trên máy ảo Ubuntu:
 <img src="http://2.pik.vn/201879a8b951-e9ea-4ec2-a20a-d9c64a09ee22.png">
  Thấy có sẵn card bridge. Thêm card mạng thứ 2 vào máy ảo bằng cách: Edit Virtual Machine Settings -> Add -> Network
