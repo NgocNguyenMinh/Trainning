@@ -2,12 +2,12 @@
 
 ---
 # **Nội dung**
-[1. Github desktop](#Githubdesktop)
+[1. Github desktop](#1)
 
-[2. Các thao tác trên Github](#CacthaotactrenGithub)
+[2. Các thao tác trên Github](#2)
 
 ---
-<a name="Githubdesktop"></a>
+<a name="1"></a>
 # **1. Github desktop**
 Download Github desktop tại [đây](https://desktop.github.com/)
 
@@ -20,7 +20,7 @@ Download Github desktop tại [đây](https://desktop.github.com/)
 - "Push": Chuyển các thay đổi từ máy của mình cho remote project để mọi người có thể nhìn thấy nó
 - "Fork": Tạo một bản sao cho việc sử dụng riêng cá nhân trong khi không có tác động trực tiếp vào project ban đầu.
 
-<a name="CacthaotactrenGithub"></a>
+<a name="2"></a>
 # **2. Các thao tác trên Github**
 - Fork thư mục "Trainning" từ repo gốc của Lab về Github cá nhân
 <img src="http://2.pik.vn/2018f862db70-a949-448a-aace-0223bdddeab2.png">
