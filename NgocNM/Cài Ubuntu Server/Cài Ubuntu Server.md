@@ -61,8 +61,6 @@
 -
 <img src="./Picture/23.png"/>
 -
-<img src="./Picture/24.png"/>
--
 <img src="./Picture/25.png"/>
 -
 <img src="./Picture/26.png"/>
